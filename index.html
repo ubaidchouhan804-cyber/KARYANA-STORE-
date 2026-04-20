@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karyana Store POS & Management</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">🏪 Karyana Manager</div>
+        <ul class="nav-links">
+            <li data-target="dashboard" class="active">📊 Dashboard</li>
+            <li data-target="pos">🛒 Point of Sale</li>
+            <li data-target="inventory">📦 Inventory</li>
+            <li data-target="ledger">💰 Partner Ledger</li>
+            <li data-target="chatbot">🤖 Decision AI</li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="page-section active">
+            <h2 class="page-title">Store Dashboard</h2>
+            <div class="dashboard-cards">
+                <div class="card">
+                    <h3>Today's Sales</h3>
+                    <div class="value" id="dash-sales">Rs. 0</div>
+                </div>
+                <div class="card">
+                    <h3>Total Inventory Value</h3>
+                    <div class="value" id="dash-inv-val">Rs. 0</div>
+                </div>
+                <div class="card">
+                    <h3>Estimated Total Profit</h3>
+                    <div class="value" id="dash-profit">Rs. 0</div>
+                </div>
+            </div>
+            <h3 style="margin-bottom: 15px; color: var(--primary);">Inventory Alerts</h3>
+            <div class="alerts-container" id="dash-alerts">
+                <!-- Alerts dynamically loaded -->
+            </div>
+        </section>
+
+        <!-- POS Section -->
+        <section id="pos" class="page-section">
+            <h2 class="page-title">Point of Sale</h2>
+            <div class="pos-container">
+                <div class="pos-items" id="pos-grid">
+                    <!-- POS items dynamically loaded -->
+                </div>
+                <div class="pos-cart">
+                    <div class="cart-header">Current Order</div>
+                    <div class="cart-items" id="cart-items">
+                        <!-- Cart items dynamically loaded -->
+                    </div>
+                    <div class="cart-controls">
+                        <div class="cart-total">
+                            <span>Total:</span>
+                            <span id="cart-total-amt">Rs. 0</span>
+                        </div>
+                        <button id="btn-checkout" class="btn btn-checkout">Process Sale / Checkout</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Inventory Section -->
+        <section id="inventory" class="page-section">
+            <h2 class="page-title">Inventory Management</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Item Name</th>
+                        <th>Current Stock</th>
+                        <th>Min Level</th>
+                        <th>Price per Unit</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="inventory-tbody">
+                    <!-- Inventory rows dynamically loaded -->
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Ledger Section -->
+        <section id="ledger" class="page-section">
+            <h2 class="page-title">Partner Financial Ledger</h2>
+            <p style="margin-bottom: 20px; color: #64748b;">Financial breakdown for the 3 partners. Profits are split equally (33.3% each).</p>
+            <div class="ledger-grid" id="ledger-grid">
+                <!-- Partner cards dynamically loaded -->
+            </div>
+        </section>
+
+        <!-- Chatbot Section -->
+        <section id="chatbot" class="page-section">
+            <h2 class="page-title">Decision Analysis Chatbot</h2>
+            <div class="chat-container">
+                <div class="chat-window" id="chat-window">
+                    <!-- Chat messages dynamically loaded -->
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" placeholder="Ask about restocks, profits, or today's sales...">
+                    <button id="btn-send" class="btn">Send</button>
+                </div>
+            </div>
+        </section>
+    </div>
+    <script src="./script.js"></script>
+</body>
+</html>
