@@ -1,28 +1,16 @@
 // App State
+// Start fully empty as requested
 let state = {
-    inventory: [
-        { id: 1, name: 'Atta (Flour) 10kg', price: 1200, stock: 5, min: 10 },
-        { id: 2, name: 'Basmati Rice 5kg', price: 950, stock: 12, min: 5 },
-        { id: 3, name: 'Sugar 1kg', price: 150, stock: 45, min: 20 },
-        { id: 4, name: 'Cooking Oil 1L', price: 550, stock: 8, min: 15 },
-        { id: 5, name: 'Daal Chana 1kg', price: 220, stock: 3, min: 10 },
-        { id: 6, name: 'Tea Leaves 800g', price: 850, stock: 10, min: 5 },
-        { id: 7, name: 'Salt 800g', price: 50, stock: 30, min: 10 },
-        { id: 8, name: 'Spices Mix 50g', price: 100, stock: 18, min: 15 }
-    ],
+    inventory: [],
     cart: [],
-    partners: [
-        { id: 1, name: 'Ali', investment: 100000, withdrawals: 12000 },
-        { id: 2, name: 'Bilal', investment: 100000, withdrawals: 5000 },
-        { id: 3, name: 'Zayed', investment: 100000, withdrawals: 15000 }
-    ],
-    salesToday: 4250,
-    totalRevenue: 250000,
-    profitMargin: 0.15 // 15% overall profit margin assumption
+    partners: [],
+    salesToday: 0,
+    totalRevenue: 0,
+    profitMargin: 0.15 
 };
 
 // Format Currency
-const formatCurr = (num) => 'Rs. ' + num.toLocaleString();
+const formatCurr = (num) => 'Rs. ' + Number(num).toLocaleString();
 
 // DOM Elements
 const navLinks = document.querySelectorAll('.nav-links li');
@@ -49,9 +37,10 @@ function renderActiveSection(section) {
     else if (section === 'ledger') renderLedger();
 }
 
-// Dashboard
+// ====== DASHBOARD LOGIC ======
 function renderDashboard() {
     document.getElementById('dash-sales').innerText = formatCurr(state.salesToday);
+    
     const invValue = state.inventory.reduce((sum, item) => sum + (item.price * item.stock), 0);
     document.getElementById('dash-inv-val').innerText = formatCurr(invValue);
 
@@ -60,42 +49,211 @@ function renderDashboard() {
 
     const alertsContainer = document.getElementById('dash-alerts');
     alertsContainer.innerHTML = '';
+    
+    if (state.inventory.length === 0) {
+        alertsContainer.innerHTML = '<div class="empty-state" style="margin:0; padding:15px;">No products to monitor yet. Store is entirely empty.</div>';
+        return;
+    }
+
     const lowStockItems = state.inventory.filter(item => item.stock <= item.min);
     if (lowStockItems.length === 0) {
-        alertsContainer.innerHTML = '<p style="color:var(--success); font-weight:500;">All stock levels are optimal.</p>';
+        alertsContainer.innerHTML = '<div style="color:var(--success); font-weight:800; font-size:18px;">ALL STOCK OPTIMAL</div>';
     } else {
         lowStockItems.forEach(item => {
             const div = document.createElement('div');
-            div.className = 'alert-item';
-            div.innerText = `⚠️ Low stock for ${item.name} (Only ${item.stock} left)`;
+            div.style.cssText = 'background:var(--danger); color:var(--white); padding:10px 15px; margin-bottom:10px; font-weight:bold; border-radius:4px;';
+            div.innerText = `⚠️ IMMEDIATE RESTOCK: ${item.name} (Only ${item.stock} left out of ${item.min} minimum!)`;
             alertsContainer.appendChild(div);
         });
     }
 }
 
-// POS System
-function renderPOS() {
-    const grid = document.getElementById('pos-grid');
-    grid.innerHTML = '';
+// ====== INVENTORY LOGIC ======
+window.addProduct = function() {
+    const nameInput = document.getElementById('new-item-name');
+    const priceInput = document.getElementById('new-item-price');
+    const minInput = document.getElementById('new-item-min');
+
+    const name = nameInput.value.trim();
+    const price = parseFloat(priceInput.value);
+    const min = parseInt(minInput.value);
+
+    // Basic Validation
+    if(!name || isNaN(price) || isNaN(min)) {
+        alert("Please enter valid product details!");
+        return;
+    }
+
+    state.inventory.push({
+        id: Date.now(),
+        name: name,
+        price: price,
+        stock: 0, // Physical stock begins at 0 logically.
+        min: min
+    });
+
+    // Clear inputs
+    nameInput.value = '';
+    priceInput.value = '';
+    minInput.value = '';
+    
+    // Rerender specific views
+    renderInventory();
+    renderDashboard();
+}
+
+window.deleteProduct = function(id) {
+    if(confirm("Are you sure you want to delete this product entirely from the system?")) {
+        state.inventory = state.inventory.filter(item => item.id !== id);
+        // Clean out active cart/bill as well to prevent reference errors
+        state.cart = state.cart.filter(c => c.id !== id);
+        renderInventory();
+        renderDashboard();
+        renderPOS();
+    }
+}
+
+window.quickRestock = (id) => {
+    const item = state.inventory.find(i => i.id === id);
+    if (item) item.stock += 10; // Physically adds 10 to shelf
+    renderInventory();
+    renderDashboard();
+}
+
+function renderInventory() {
+    const tbody = document.getElementById('inventory-tbody');
+    const emptyState = document.getElementById('inventory-empty-state');
+    const table = document.getElementById('inventory-table');
+    
+    tbody.innerHTML = '';
+    
+    if (state.inventory.length === 0) {
+        emptyState.style.display = 'block';
+        table.style.display = 'none';
+        return;
+    }
+
+    emptyState.style.display = 'none';
+    table.style.display = 'table';
+
     state.inventory.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'pos-item-card';
-        div.innerHTML = `
-            <h4>${item.name}</h4>
-            <div class="price">${formatCurr(item.price)}</div>
-            <div style="font-size: 0.85rem; color: #64748b; font-weight: 500;">Stock: ${item.stock}</div>
+        const tr = document.createElement('tr');
+        if (item.stock <= item.min) tr.className = 'low-stock';
+        tr.innerHTML = `
+            <td><strong>${item.name}</strong></td>
+            <td style="font-size:18px; font-weight:800;">${item.stock}</td>
+            <td>${item.min}</td>
+            <td>${formatCurr(item.price)}</td>
+            <td>
+                <button class="btn btn-restock" style="padding: 6px 12px; font-size: 12px;" onclick="quickRestock(${item.id})">+10 Stock</button>
+                <button class="btn btn-delete" style="padding: 6px 12px; font-size: 12px; margin-left: 5px;" onclick="deleteProduct(${item.id})">Delete</button>
+            </td>
         `;
-        div.onclick = () => addToCart(item);
+        tbody.appendChild(tr);
+    });
+}
+
+// ====== PARTNER LOGIC ======
+window.addPartner = function() {
+    const nameInput = document.getElementById('new-partner-name');
+    const invInput = document.getElementById('new-partner-inv');
+
+    const name = nameInput.value.trim();
+    const inv = parseFloat(invInput.value);
+
+    // Basic Validation
+    if(!name || isNaN(inv)) {
+        alert("Please enter valid partner details!");
+        return;
+    }
+
+    state.partners.push({
+        id: Date.now(),
+        name: name,
+        investment: inv,
+        withdrawals: 0
+    });
+
+    nameInput.value = '';
+    invInput.value = '';
+    
+    renderLedger();
+}
+
+window.deletePartner = function(id) {
+    if(confirm("Are you sure you want to remove this partner from the ledger?")) {
+        state.partners = state.partners.filter(p => p.id !== id);
+        renderLedger();
+    }
+}
+
+function renderLedger() {
+    const grid = document.getElementById('ledger-grid');
+    const emptyState = document.getElementById('ledger-empty-state');
+    grid.innerHTML = '';
+    
+    if (state.partners.length === 0) {
+        emptyState.style.display = 'block';
+        return;
+    }
+
+    emptyState.style.display = 'none';
+
+    const totalProfit = state.totalRevenue * state.profitMargin;
+    // Mathematically split perfectly
+    const sharePercentage = (100 / state.partners.length).toFixed(1);
+    const equalShare = totalProfit / state.partners.length;
+
+    state.partners.forEach(partner => {
+        const netBalance = partner.investment + equalShare - partner.withdrawals;
+        const div = document.createElement('div');
+        div.className = 'partner-card';
+        div.innerHTML = `
+            <h3>${partner.name}
+               <button class="btn btn-delete" style="padding: 4px 8px; font-size: 12px;" onclick="deletePartner(${partner.id})">Remove</button>
+            </h3>
+            <div style="font-size:14px; color:var(--orange); font-weight:800; margin-bottom:10px;">Equity Share: ${sharePercentage}%</div>
+            <div class="ledger-row"><span>Investment:</span> <strong>${formatCurr(partner.investment)}</strong></div>
+            <div class="ledger-row"><span>Profit Share:</span> <strong>${formatCurr(equalShare)}</strong></div>
+            <div class="ledger-row"><span>Drawings:</span> <strong style="color:var(--danger);">${formatCurr(partner.withdrawals)}</strong></div>
+            <div class="ledger-row total"><span>Net Equity:</span> <span>${formatCurr(netBalance)}</span></div>
+        `;
         grid.appendChild(div);
     });
+}
+
+// ====== POINT OF SALE LOGIC ======
+function renderPOS() {
+    const grid = document.getElementById('pos-grid');
+    const emptyState = document.getElementById('pos-empty-state');
+    grid.innerHTML = '';
+    
+    // Handle empty inventory inside physical POS environment
+    if (state.inventory.length === 0) {
+        emptyState.style.display = 'block';
+    } else {
+        emptyState.style.display = 'none';
+        state.inventory.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'pos-item-card';
+            div.innerHTML = `
+                <h4>${item.name}</h4>
+                <div class="price">${formatCurr(item.price)}</div>
+                <div style="font-size: 14px; color: #555; font-weight: 700;">In Stock: <span style="color:${item.stock > 0 ? "var(--success)" : "var(--danger)"}">${item.stock}</span></div>
+            `;
+            // Trigger cart function
+            div.onclick = () => addToCart(item);
+            grid.appendChild(div);
+        });
+    }
     renderCart();
 }
 
 function addToCart(item) {
-    if (item.stock <= 0) return alert('Out of stock!');
+    if (item.stock <= 0) return alert('Physical stock is completely empty on the shelf! Cannot ring up.');
     const existing = state.cart.find(c => c.id === item.id);
     if (existing) {
-        if (existing.qty >= item.stock) return alert('Cannot add more than available stock.');
+        if (existing.qty >= item.stock) return alert('Cannot ring up more quantities than physically available.');
         existing.qty++;
     } else {
         state.cart.push({ ...item, qty: 1 });
@@ -103,7 +261,7 @@ function addToCart(item) {
     renderCart();
 }
 
-function removeFromCart(id) {
+window.removeFromCart = function(id) {
     state.cart = state.cart.filter(c => c.id !== id);
     renderCart();
 }
@@ -112,95 +270,55 @@ function renderCart() {
     const cartItems = document.getElementById('cart-items');
     cartItems.innerHTML = '';
     let total = 0;
+    
     state.cart.forEach(item => {
         const itemTotal = item.price * item.qty;
         total += itemTotal;
         const div = document.createElement('div');
-        div.className = 'cart-item';
+        div.className = 'bill-item';
         div.innerHTML = `
-            <div class="cart-item-info">
-                <strong>${item.name}</strong>
-                <span>${item.qty} x ${formatCurr(item.price)}</span>
+            <div>
+                <strong style="display:block; font-size:16px;">${item.name}</strong>
+                <span style="color:#666; font-weight:bold;">${item.qty} x ${formatCurr(item.price)}</span>
             </div>
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <strong>${formatCurr(itemTotal)}</strong>
-                <button class="btn btn-remove" onclick="removeFromCart(${item.id})">Remove</button>
+            <div style="text-align:right;">
+                <strong style="display:block; font-size:16px;">${formatCurr(itemTotal)}</strong>
+                <button class="btn btn-delete" style="padding: 2px 6px; font-size: 10px; margin-top:5px;" onclick="removeFromCart(${item.id})">REMOVE</button>
             </div>
         `;
         cartItems.appendChild(div);
     });
+    
     document.getElementById('cart-total-amt').innerText = formatCurr(total);
 }
 
-window.removeFromCart = removeFromCart; // Expose globally for inline onclick
-
+// Print Bill / Process payment physically
 document.getElementById('btn-checkout').onclick = () => {
-    if (state.cart.length === 0) return alert('Cart is empty.');
+    if (state.cart.length === 0) return alert('No items scanned in the bill.');
+    
     let totalVal = 0;
     state.cart.forEach(cartItem => {
+        // Find main physical item and deduct directly
         const invItem = state.inventory.find(i => i.id === cartItem.id);
         if (invItem) invItem.stock -= cartItem.qty;
         totalVal += (cartItem.price * cartItem.qty);
     });
+    
+    // Add logic to store today's total metrics
     state.salesToday += totalVal;
     state.totalRevenue += totalVal;
+    
+    // Empty current customer's bill
     state.cart = [];
-    alert('Sale completed successfully!');
+    alert('Sale completely processed! Register drawer opens.');
+    
+    // Re-render components with newly impacted numbers
     renderPOS();
-    renderDashboard(); // refresh dashboard in background
+    renderDashboard();
+    renderLedger(); 
 };
 
-// Inventory Management
-function renderInventory() {
-    const tbody = document.getElementById('inventory-tbody');
-    tbody.innerHTML = '';
-    state.inventory.forEach(item => {
-        const tr = document.createElement('tr');
-        if (item.stock <= item.min) tr.className = 'low-stock';
-        tr.innerHTML = `
-            <td>${item.id}</td>
-            <td><strong>${item.name}</strong></td>
-            <td>${item.stock}</td>
-            <td>${item.min}</td>
-            <td>${formatCurr(item.price)}</td>
-            <td>
-                <button class="btn" style="padding: 6px 12px; font-size: 0.9rem;" onclick="quickRestock(${item.id})">+10 Stock</button>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
-}
-
-window.quickRestock = (id) => {
-    const item = state.inventory.find(i => i.id === id);
-    if (item) item.stock += 10;
-    renderInventory();
-    renderDashboard(); // Update alerts if any
-}
-
-// Partner Ledger
-function renderLedger() {
-    const grid = document.getElementById('ledger-grid');
-    grid.innerHTML = '';
-    const totalProfit = state.totalRevenue * state.profitMargin;
-    const equalShare = totalProfit / 3;
-
-    state.partners.forEach(partner => {
-        const netBalance = equalShare - partner.withdrawals;
-        const div = document.createElement('div');
-        div.className = 'partner-card';
-        div.innerHTML = `
-            <h3>${partner.name} <span style="font-size:1rem; color:#64748b;">(33.3% Share)</span></h3>
-            <div class="ledger-row"><span>Initial Investment:</span> <strong>${formatCurr(partner.investment)}</strong></div>
-            <div class="ledger-row"><span>Total Profit Share:</span> <strong style="color:var(--success);">${formatCurr(equalShare)}</strong></div>
-            <div class="ledger-row"><span>Total Withdrawals:</span> <strong style="color:var(--danger);">${formatCurr(partner.withdrawals)}</strong></div>
-            <div class="ledger-row total"><span>Net Payable Balance:</span> <span>${formatCurr(netBalance)}</span></div>
-        `;
-        grid.appendChild(div);
-    });
-}
-
-// Chatbot Logic
+// ====== CHATBOT LOGIC ======
 const chatInput = document.getElementById('chat-input');
 const btnSend = document.getElementById('btn-send');
 const chatWindow = document.getElementById('chat-window');
@@ -220,19 +338,23 @@ function handleChat() {
     addMessage(chatInput.value, 'user');
     chatInput.value = '';
 
+    // Simulating AI computation
     setTimeout(() => {
-        let response = "I'm your Karyana Assistant. You can ask me about 'restock', 'sales', 'profits', or 'equity'.";
+        let response = "I am the intelligent Shop Manager Analytics Bot! I monitor everything. You can ask me regarding the specific state of our partners, inventory alerts, or total physical sales.";
 
         if (query.includes('restock') || query.includes('low') || query.includes('inventory')) {
             const low = state.inventory.filter(i => i.stock <= i.min).map(i => i.name).join(', ');
-            response = low ? `Currently, you are low on: ${low}. You should restock these immediately.` : 'All inventory levels are looking healthy! No urgent restocking needed.';
+            response = low ? `URGENT WARNING: You critically need to physically restock: ${low}.` : 'Stock is completely satisfactory right now!';
+            if(state.inventory.length === 0) response = "There is no physical stock installed into the POS whatsoever.";
         } else if (query.includes('sales') || query.includes('today')) {
-            response = `Today's total sales are ${formatCurr(state.salesToday)}.`;
-        } else if (query.includes('profit') || query.includes('equity') || query.includes('split') || query.includes('partner')) {
-            const profit = state.totalRevenue * state.profitMargin;
-            response = `The total estimated profit is ${formatCurr(profit)}. Each of the 3 partners has an equal 33.3% share amounting to ${formatCurr(profit/3)}.`;
-        } else if (query.includes('hi') || query.includes('hello')) {
-            response = "Hello Partner! How can I assist you with the store management today?";
+            response = `Total counter sales today equal out to exactly ${formatCurr(state.salesToday)}.`;
+        } else if (query.includes('profit') || query.includes('equity') || query.includes('partner') || query.includes('split')) {
+            if (state.partners.length === 0) {
+                response = "There are zero partners officially registered into the system to split the total daily revenue with.";
+            } else {
+                const profit = state.totalRevenue * state.profitMargin;
+                response = `Current Estimated Working Profit is ${formatCurr(profit)}. It automatically splits down to ${formatCurr(profit/state.partners.length)} per partner amongst the exactly ${state.partners.length} registered system partners.`;
+            }
         }
 
         addMessage(response, 'bot');
@@ -242,6 +364,9 @@ function handleChat() {
 btnSend.onclick = handleChat;
 chatInput.onkeypress = (e) => { if (e.key === 'Enter') handleChat(); };
 
-// Initial Render
-addMessage("Hello! I am your AI assistant for the Karyana Store. Ask me about inventory, profits, or sales.", 'bot');
+// Initial Boot Processes
+addMessage("System Online. Store is ready for physical sales. Remember: Add Initial Products & Partners FIRST.", 'bot');
 renderDashboard();
+renderInventory();
+renderLedger();
+renderPOS();

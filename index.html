@@ -3,39 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Karyana Store POS & Management</title>
+    <title>Physical Karyana POS</title>
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-    <div class="sidebar">
-        <div class="sidebar-header">🏪 Karyana Manager</div>
+    <nav class="top-navbar">
+        <div class="nav-brand"><span class="orange-text">Shop</span>Manager</div>
         <ul class="nav-links">
-            <li data-target="dashboard" class="active">📊 Dashboard</li>
-            <li data-target="pos">🛒 Point of Sale</li>
-            <li data-target="inventory">📦 Inventory</li>
-            <li data-target="ledger">💰 Partner Ledger</li>
-            <li data-target="chatbot">🤖 Decision AI</li>
+            <li data-target="dashboard" class="active">Dashboard</li>
+            <li data-target="pos">POS Terminal</li>
+            <li data-target="inventory">Inventory</li>
+            <li data-target="ledger">Partners</li>
+            <li data-target="chatbot">Analytics</li>
         </ul>
-    </div>
+    </nav>
     <div class="main-content">
         <!-- Dashboard Section -->
         <section id="dashboard" class="page-section active">
-            <h2 class="page-title">Store Dashboard</h2>
+            <h2 class="page-title">Today's Overview</h2>
             <div class="dashboard-cards">
                 <div class="card">
-                    <h3>Today's Sales</h3>
+                    <h3>Counter Sales</h3>
                     <div class="value" id="dash-sales">Rs. 0</div>
                 </div>
                 <div class="card">
-                    <h3>Total Inventory Value</h3>
+                    <h3>Total Stock Value</h3>
                     <div class="value" id="dash-inv-val">Rs. 0</div>
                 </div>
                 <div class="card">
-                    <h3>Estimated Total Profit</h3>
+                    <h3>Estimated Profit</h3>
                     <div class="value" id="dash-profit">Rs. 0</div>
                 </div>
             </div>
-            <h3 style="margin-bottom: 15px; color: var(--primary);">Inventory Alerts</h3>
+            <h3 class="section-subtitle">Stock Alerts</h3>
             <div class="alerts-container" id="dash-alerts">
                 <!-- Alerts dynamically loaded -->
             </div>
@@ -43,22 +43,25 @@
 
         <!-- POS Section -->
         <section id="pos" class="page-section">
-            <h2 class="page-title">Point of Sale</h2>
+            <h2 class="page-title">Physical POS Terminal</h2>
             <div class="pos-container">
-                <div class="pos-items" id="pos-grid">
-                    <!-- POS items dynamically loaded -->
-                </div>
-                <div class="pos-cart">
-                    <div class="cart-header">Current Order</div>
-                    <div class="cart-items" id="cart-items">
-                        <!-- Cart items dynamically loaded -->
+                <div class="pos-items-area">
+                    <div id="pos-empty-state" class="empty-state">Inventory is empty. Add products to start selling.</div>
+                    <div class="pos-items" id="pos-grid">
+                        <!-- Items rendered here -->
                     </div>
-                    <div class="cart-controls">
-                        <div class="cart-total">
-                            <span>Total:</span>
+                </div>
+                <div class="pos-bill">
+                    <div class="bill-header">Current Order Ticket</div>
+                    <div class="bill-items" id="cart-items">
+                        <!-- Added items here -->
+                    </div>
+                    <div class="bill-controls">
+                        <div class="bill-total">
+                            <span>TOTAL:</span>
                             <span id="cart-total-amt">Rs. 0</span>
                         </div>
-                        <button id="btn-checkout" class="btn btn-checkout">Process Sale / Checkout</button>
+                        <button id="btn-checkout" class="btn btn-checkout">PROCESS SALE</button>
                     </div>
                 </div>
             </div>
@@ -66,43 +69,63 @@
 
         <!-- Inventory Section -->
         <section id="inventory" class="page-section">
-            <h2 class="page-title">Inventory Management</h2>
-            <table>
+            <h2 class="page-title">Inventory Data</h2>
+            <div class="add-form">
+                <h3>Add New Product</h3>
+                <div class="form-group-row">
+                    <input type="text" id="new-item-name" placeholder="Product Name">
+                    <input type="number" id="new-item-price" placeholder="Retail Price">
+                    <input type="number" id="new-item-min" placeholder="Alert Level Limit">
+                    <button class="btn btn-add" onclick="addProduct()">Add Product</button>
+                </div>
+            </div>
+            <table id="inventory-table">
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Item Name</th>
-                        <th>Current Stock</th>
-                        <th>Min Level</th>
-                        <th>Price per Unit</th>
+                        <th>Physical Stock</th>
+                        <th>Alert Limit</th>
+                        <th>Price/Unit</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody id="inventory-tbody">
-                    <!-- Inventory rows dynamically loaded -->
-                </tbody>
+                <tbody id="inventory-tbody"></tbody>
             </table>
+            <div id="inventory-empty-state" class="empty-state">Store has absolutely no stock listed right now. Start by adding new products!</div>
         </section>
 
         <!-- Ledger Section -->
         <section id="ledger" class="page-section">
-            <h2 class="page-title">Partner Financial Ledger</h2>
-            <p style="margin-bottom: 20px; color: #64748b;">Financial breakdown for the 3 partners. Profits are split equally (33.3% each).</p>
-            <div class="ledger-grid" id="ledger-grid">
-                <!-- Partner cards dynamically loaded -->
+            <h2 class="page-title">Partner Ledger Console</h2>
+            <div class="add-form">
+                <h3>Register New Partner</h3>
+                <div class="form-group-row">
+                    <input type="text" id="new-partner-name" placeholder="Full Partner Name">
+                    <input type="number" id="new-partner-inv" placeholder="Initial Investment (Rs)">
+                    <button class="btn btn-add" onclick="addPartner()">Register Record</button>
+                </div>
             </div>
+            <div class="ledger-grid" id="ledger-grid">
+                <!-- Partner cards render here -->
+            </div>
+            <div id="ledger-empty-state" class="empty-state">No business partners are currently registered.</div>
         </section>
 
         <!-- Chatbot Section -->
         <section id="chatbot" class="page-section">
-            <h2 class="page-title">Decision Analysis Chatbot</h2>
-            <div class="chat-container">
-                <div class="chat-window" id="chat-window">
-                    <!-- Chat messages dynamically loaded -->
+            <h2 class="page-title">Decision Analytics Chat</h2>
+            <div class="chat-wrapper">
+                <div class="chat-character">
+                    <div class="moving-3d-character">👨‍💼</div>
                 </div>
-                <div class="chat-input-area">
-                    <input type="text" id="chat-input" placeholder="Ask about restocks, profits, or today's sales...">
-                    <button id="btn-send" class="btn">Send</button>
+                <div class="chat-container">
+                    <div class="chat-window" id="chat-window">
+                        <!-- Chat messages dynamically loaded -->
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chat-input" placeholder="Type query for Shop Manager AI...">
+                        <button id="btn-send" class="btn btn-action">COMMAND</button>
+                    </div>
                 </div>
             </div>
         </section>
