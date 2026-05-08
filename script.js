@@ -119,8 +119,8 @@ window.resetBreeding = function() {
     parentA_Data = null;
     parentB_Data = null;
     
-    document.getElementById('contentA').innerHTML = '<span class="placeholder-icon">?</span>';
-    document.getElementById('contentB').innerHTML = '<span class="placeholder-icon">?</span>';
+    document.getElementById('contentA').innerHTML = '<span class="placeholder-text">Select</span>';
+    document.getElementById('contentB').innerHTML = '<span class="placeholder-text">Select</span>';
     
     const childSlot = document.getElementById('slotChild');
     childSlot.classList.remove('has-result');
@@ -129,27 +129,42 @@ window.resetBreeding = function() {
     setActiveSlot('A');
 };
 
+
+
 // Search Filter functionality
 function setupSearch() {
     const searchBar = document.getElementById('globalSearch');
-    searchBar.addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase();
-        const filtered = pokemonDatabase.filter(p => p.name.toLowerCase().includes(term));
-        renderGrid(filtered);
-    });
+    if (searchBar) {
+        searchBar.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = pokemonDatabase.filter(p => p.name.toLowerCase().includes(term));
+            renderGrid(filtered);
+        });
+    }
 }
 
 // Navbar Section Switching Logic
 window.showSection = function(sectionId) {
+    const event = window.event;
+    if (event) event.preventDefault();
+
     // Hide all sections
     document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active-section'));
-    // Show target section
-    document.getElementById(`${sectionId}-section`).classList.add('active-section');
+    
+    const targetSection = document.getElementById(`${sectionId}-section`);
+    if (targetSection) {
+        targetSection.classList.add('active-section');
+    }
     
     // Update active nav link
     document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active-nav'));
-    // Fixed: accessibility to event object
-    if (window.event) {
-        window.event.target.classList.add('active-nav');
+    
+    // If we have an event, try to find the target link
+    if (event) {
+        // The click might be on a child element, find the closest <a>
+        const link = event.target.closest('a');
+        if (link) {
+            link.classList.add('active-nav');
+        }
     }
 };

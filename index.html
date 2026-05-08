@@ -3,40 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PokéBreed - Visual Breeding Calculator</title>
+    <title>PokeBreeding2.0 - Visual Breeding Interface</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header class="navbar">
         <div class="logo">
-            <span class="icon">🐾</span> <span class="text">PokéBreed</span>
+            <span class="text">PokeBreeding2.0</span>
         </div>
         <nav class="nav-links">
+            <a href="#pokes" onclick="showSection('pokes')">Pokes</a>
             <a href="#map" onclick="showSection('map')">Map</a>
-            <a href="#pokedex" onclick="showSection('pokedex')">Pokédex</a>
-            <a href="#tierlist" onclick="showSection('tierlist')">Tier List</a>
             <a href="#items" onclick="showSection('items')">Items</a>
-            <a href="#" onclick="showSection('calculator')" class="active-nav">Calculator</a>
+            <a href="#breeding" onclick="showSection('breeding')" class="active-nav">Breeding Calculator</a>
+            <a href="#structures" onclick="showSection('structures')">Structures</a>
+            <a href="#tierlist" onclick="showSection('tierlist')">Tier List</a>
+            <a href="#technology" onclick="showSection('technology')">Technology</a>
+            <a href="#capturerate" onclick="showSection('capturerate')">Capture Rate</a>
         </nav>
-        <div class="search-profile">
-            <input type="text" id="globalSearch" placeholder="Search Pokémon..." class="top-search">
+        <div class="language-selector">
+            🇺🇸 English ▾
         </div>
     </header>
 
     <main class="container" id="main-content">
-        <div id="calculator-section" class="content-section active-section">
+        <div id="breeding-section" class="content-section active-section">
             
-            <div class="instructions">
-                <h2>Visual Breeding Interface</h2>
-                <p>Click on a Parent Slot, then select a Pokémon from the grid below.</p>
-            </div>
-
             <div class="breeding-arena">
                 <div class="slot-card parent-slot active-slot" id="slotA" onclick="setActiveSlot('A')">
                     <span class="slot-label">Parent A</span>
                     <div class="slot-content" id="contentA">
-                        <span class="placeholder-icon">?</span>
+                        <span class="placeholder-text">Select</span>
                     </div>
                 </div>
 
@@ -45,7 +43,7 @@
                 <div class="slot-card parent-slot" id="slotB" onclick="setActiveSlot('B')">
                     <span class="slot-label">Parent B</span>
                     <div class="slot-content" id="contentB">
-                        <span class="placeholder-icon">?</span>
+                        <span class="placeholder-text">Select</span>
                     </div>
                 </div>
 
@@ -64,31 +62,49 @@
             </div>
 
             <div class="pool-container">
-                <h3>Select a Pokémon (Click to assign to active slot)</h3>
+                <div class="search-box">
+                    <input type="text" id="globalSearch" placeholder="Search Pokes..." class="top-search">
+                </div>
+                <h3>Select a Poke (Click to assign to active slot)</h3>
                 <div id="pokemon-grid" class="pokemon-grid">
-                    <div class="loading-text">Loading 200 Pokémon Database...</div>
+                    <div class="loading-text">Loading 200 Pokes Database...</div>
                 </div>
             </div>
         </div>
 
+        <div id="pokes-section" class="content-section">
+            <h2>Pokes Directory</h2>
+            <div class="placeholder-box">Master list of all Pokes.</div>
+        </div>
+
         <div id="map-section" class="content-section">
-            <h2>Palpagos Regional Map</h2>
-            <div class="placeholder-box">Map integration goes here.</div>
-        </div>
-
-        <div id="pokedex-section" class="content-section">
-            <h2>Master Pokédex</h2>
-            <div class="placeholder-box">Pokédex list will be displayed here.</div>
-        </div>
-
-        <div id="tierlist-section" class="content-section">
-            <h2>Battling Tier List</h2>
-            <div class="placeholder-box">S, A, B, C tier rankings go here.</div>
+            <h2>Map</h2>
+            <div class="placeholder-box">Palpagos Regional Map integration.</div>
         </div>
 
         <div id="items-section" class="content-section">
-            <h2>Breeding Items</h2>
-            <div class="placeholder-box">List of items (Everstone, Destiny Knot, etc.) goes here.</div>
+            <h2>Items</h2>
+            <div class="placeholder-box">List of all items and resources.</div>
+        </div>
+
+        <div id="structures-section" class="content-section">
+            <h2>Structures</h2>
+            <div class="placeholder-box">Base structures and defensive buildings.</div>
+        </div>
+
+        <div id="tierlist-section" class="content-section">
+            <h2>Tier List</h2>
+            <div class="placeholder-box">Strongest Pals rankings.</div>
+        </div>
+
+        <div id="technology-section" class="content-section">
+            <h2>Technology</h2>
+            <div class="placeholder-box">Technology tree and unlocks.</div>
+        </div>
+
+        <div id="capturerate-section" class="content-section">
+            <h2>Capture Rate</h2>
+            <div class="placeholder-box">Capture probability calculator.</div>
         </div>
 
     </main>
