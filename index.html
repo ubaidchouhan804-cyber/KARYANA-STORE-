@@ -3,133 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Physical Karyana POS</title>
-    <link rel="stylesheet" href="./style.css">
+    <title>PokéBreed - Visual Breeding Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <nav class="top-navbar">
-        <div class="nav-brand"><span class="orange-text">Shop</span>Manager</div>
-        <ul class="nav-links">
-            <li data-target="dashboard" class="active">Dashboard</li>
-            <li data-target="pos">POS Terminal</li>
-            <li data-target="inventory">Inventory</li>
-            <li data-target="ledger">Partners</li>
-            <li data-target="chatbot">Analytics</li>
-        </ul>
-    </nav>
-    <div class="main-content">
-        <!-- Dashboard Section -->
-        <section id="dashboard" class="page-section active">
-            <h2 class="page-title">Today's Overview</h2>
-            <div class="dashboard-cards">
-                <div class="card">
-                    <h3>Counter Sales</h3>
-                    <div class="value" id="dash-sales">Rs. 0</div>
-                </div>
-                <div class="card">
-                    <h3>Total Stock Value</h3>
-                    <div class="value" id="dash-inv-val">Rs. 0</div>
-                </div>
-                <div class="card">
-                    <h3>Estimated Profit</h3>
-                    <div class="value" id="dash-profit">Rs. 0</div>
-                </div>
-            </div>
-            <h3 class="section-subtitle">Stock Alerts</h3>
-            <div class="alerts-container" id="dash-alerts">
-                <!-- Alerts dynamically loaded -->
-            </div>
-        </section>
+    <header class="navbar">
+        <div class="logo">
+            <span class="icon">🐾</span> <span class="text">PokéBreed</span>
+        </div>
+        <nav class="nav-links">
+            <a href="#map" onclick="showSection('map')">Map</a>
+            <a href="#pokedex" onclick="showSection('pokedex')">Pokédex</a>
+            <a href="#tierlist" onclick="showSection('tierlist')">Tier List</a>
+            <a href="#items" onclick="showSection('items')">Items</a>
+            <a href="#" onclick="showSection('calculator')" class="active-nav">Calculator</a>
+        </nav>
+        <div class="search-profile">
+            <input type="text" id="globalSearch" placeholder="Search Pokémon..." class="top-search">
+        </div>
+    </header>
 
-        <!-- POS Section -->
-        <section id="pos" class="page-section">
-            <h2 class="page-title">Physical POS Terminal</h2>
-            <div class="pos-container">
-                <div class="pos-items-area">
-                    <div id="pos-empty-state" class="empty-state">Inventory is empty. Add products to start selling.</div>
-                    <div class="pos-items" id="pos-grid">
-                        <!-- Items rendered here -->
-                    </div>
-                </div>
-                <div class="pos-bill">
-                    <div class="bill-header">Current Order Ticket</div>
-                    <div class="bill-items" id="cart-items">
-                        <!-- Added items here -->
-                    </div>
-                    <div class="bill-controls">
-                        <div class="bill-total">
-                            <span>TOTAL:</span>
-                            <span id="cart-total-amt">Rs. 0</span>
-                        </div>
-                        <button id="btn-checkout" class="btn btn-checkout">PROCESS SALE</button>
-                    </div>
-                </div>
+    <main class="container" id="main-content">
+        <div id="calculator-section" class="content-section active-section">
+            
+            <div class="instructions">
+                <h2>Visual Breeding Interface</h2>
+                <p>Click on a Parent Slot, then select a Pokémon from the grid below.</p>
             </div>
-        </section>
 
-        <!-- Inventory Section -->
-        <section id="inventory" class="page-section">
-            <h2 class="page-title">Inventory Data</h2>
-            <div class="add-form">
-                <h3>Add New Product</h3>
-                <div class="form-group-row">
-                    <input type="text" id="new-item-name" placeholder="Product Name">
-                    <input type="number" id="new-item-price" placeholder="Retail Price">
-                    <input type="number" id="new-item-min" placeholder="Alert Level Limit">
-                    <button class="btn btn-add" onclick="addProduct()">Add Product</button>
-                </div>
-            </div>
-            <table id="inventory-table">
-                <thead>
-                    <tr>
-                        <th>Item Name</th>
-                        <th>Physical Stock</th>
-                        <th>Alert Limit</th>
-                        <th>Price/Unit</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="inventory-tbody"></tbody>
-            </table>
-            <div id="inventory-empty-state" class="empty-state">Store has absolutely no stock listed right now. Start by adding new products!</div>
-        </section>
-
-        <!-- Ledger Section -->
-        <section id="ledger" class="page-section">
-            <h2 class="page-title">Partner Ledger Console</h2>
-            <div class="add-form">
-                <h3>Register New Partner</h3>
-                <div class="form-group-row">
-                    <input type="text" id="new-partner-name" placeholder="Full Partner Name">
-                    <input type="number" id="new-partner-inv" placeholder="Initial Investment (Rs)">
-                    <button class="btn btn-add" onclick="addPartner()">Register Record</button>
-                </div>
-            </div>
-            <div class="ledger-grid" id="ledger-grid">
-                <!-- Partner cards render here -->
-            </div>
-            <div id="ledger-empty-state" class="empty-state">No business partners are currently registered.</div>
-        </section>
-
-        <!-- Chatbot Section -->
-        <section id="chatbot" class="page-section">
-            <h2 class="page-title">Decision Analytics Chat</h2>
-            <div class="chat-wrapper">
-                <div class="chat-character">
-                    <div class="moving-3d-character">👨‍💼</div>
-                </div>
-                <div class="chat-container">
-                    <div class="chat-window" id="chat-window">
-                        <!-- Chat messages dynamically loaded -->
+            <div class="breeding-arena">
+                <div class="slot-card parent-slot active-slot" id="slotA" onclick="setActiveSlot('A')">
+                    <span class="slot-label">Parent A</span>
+                    <div class="slot-content" id="contentA">
+                        <span class="placeholder-icon">?</span>
                     </div>
-                    <div class="chat-input-area">
-                        <input type="text" id="chat-input" placeholder="Type query for Shop Manager AI...">
-                        <button id="btn-send" class="btn btn-action">COMMAND</button>
+                </div>
+
+                <div class="operator">+</div>
+
+                <div class="slot-card parent-slot" id="slotB" onclick="setActiveSlot('B')">
+                    <span class="slot-label">Parent B</span>
+                    <div class="slot-content" id="contentB">
+                        <span class="placeholder-icon">?</span>
+                    </div>
+                </div>
+
+                <div class="operator">=</div>
+
+                <div class="slot-card child-slot" id="slotChild">
+                    <span class="slot-label">Result (Child)</span>
+                    <div class="slot-content" id="contentChild">
+                        <span class="placeholder-icon">?</span>
                     </div>
                 </div>
             </div>
-        </section>
-    </div>
-    <script src="./script.js"></script>
+
+            <div class="controls">
+                <button onclick="resetBreeding()" class="reset-btn">Reset Selection</button>
+            </div>
+
+            <div class="pool-container">
+                <h3>Select a Pokémon (Click to assign to active slot)</h3>
+                <div id="pokemon-grid" class="pokemon-grid">
+                    <div class="loading-text">Loading 200 Pokémon Database...</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="map-section" class="content-section">
+            <h2>Palpagos Regional Map</h2>
+            <div class="placeholder-box">Map integration goes here.</div>
+        </div>
+
+        <div id="pokedex-section" class="content-section">
+            <h2>Master Pokédex</h2>
+            <div class="placeholder-box">Pokédex list will be displayed here.</div>
+        </div>
+
+        <div id="tierlist-section" class="content-section">
+            <h2>Battling Tier List</h2>
+            <div class="placeholder-box">S, A, B, C tier rankings go here.</div>
+        </div>
+
+        <div id="items-section" class="content-section">
+            <h2>Breeding Items</h2>
+            <div class="placeholder-box">List of items (Everstone, Destiny Knot, etc.) goes here.</div>
+        </div>
+
+    </main>
+
+    <script src="script.js"></script>
 </body>
 </html>

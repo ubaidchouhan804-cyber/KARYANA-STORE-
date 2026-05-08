@@ -1,6 +1,6 @@
 {
-  "name": "Karyana Store Manager",
-  "description": "Internal management, POS, and financial tracking for a 3-partner grocery store.",
+  "name": "PokéBreed - Visual Breeding Calculator",
+  "description": "Visual Breeding Calculator with 200 Pokémon database using PokéAPI.",
   "requestFramePermissions": [],
   "majorCapabilities": []
 }
