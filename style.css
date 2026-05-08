@@ -121,16 +121,140 @@ body {
 
 /* Pokémon Grid (The 200 Pool) */
 .pool-container h3 { margin-bottom: 20px; text-align: center; border-bottom: 1px solid #333; padding-bottom: 10px; }
-.pokemon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; }
+.pokemon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
 
-.grid-item {
-    background: var(--card-black); border: 1px solid #333; border-radius: 10px;
-    padding: 15px; text-align: center; cursor: pointer; transition: all 0.2s;
+.poke-card {
+    background: var(--card-black);
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
 }
-.grid-item:hover { border-color: var(--accent-orange); transform: translateY(-5px); background: var(--card-hover); }
-.grid-img { width: 80px; height: 80px; object-fit: contain; }
-.grid-name { display: block; margin-top: 10px; font-size: 12px; font-weight: 600; text-transform: capitalize; }
-.grid-id { color: var(--text-gray); font-size: 10px; }
+
+.poke-card:hover {
+    border-color: var(--accent-orange);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    background: rgba(255, 140, 0, 0.05);
+}
+
+.card-header {
+    width: 100%;
+    display: flex;
+    gap: 4px;
+    margin-bottom: 5px;
+    justify-content: flex-start;
+}
+
+.mini-type-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Type Colors */
+.fire { background-color: #ff4422; }
+.water { background-color: #3399ff; }
+.grass { background-color: #77cc55; }
+.electric { background-color: #ffcc33; }
+.ice { background-color: #66ccff; }
+.fighting { background-color: #bb5544; }
+.poison { background-color: #aa5599; }
+.ground { background-color: #ddbb55; }
+.flying { background-color: #8899ff; }
+.psychic { background-color: #ff5599; }
+.bug { background-color: #aabb22; }
+.rock { background-color: #bbaa66; }
+.ghost { background-color: #6666bb; }
+.dragon { background-color: #7766ee; }
+.dark { background-color: #775544; }
+.steel { background-color: #aaaabb; }
+.fairy { background-color: #ee99ee; }
+.normal { background-color: #aaaa99; }
+
+.card-img {
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+    margin: 10px 0;
+    transition: 0.3s;
+}
+
+.poke-card:hover .card-img {
+    transform: scale(1.1);
+}
+
+.poke-info {
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.poke-name {
+    display: inline-block;
+    font-weight: 700;
+    text-transform: capitalize;
+    color: #fff;
+    font-size: 15px;
+}
+
+.poke-number {
+    display: inline-block;
+    font-size: 11px;
+    color: var(--text-gray);
+    margin-left: 5px;
+}
+
+.card-footer {
+    width: 100%;
+}
+
+.rarity-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    padding: 5px 10px;
+    width: 100%;
+}
+
+.rarity-value {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.rarity-text {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* Rarity colors */
+.common .rarity-text { color: #aaaaaa; }
+.rare .rarity-text { color: #3399ff; }
+.epic .rarity-text { color: #bb66ff; }
+.legendary .rarity-text { color: #ffcc00; }
+
+.rarity-badge.common { border-color: rgba(170, 170, 170, 0.3); }
+.rarity-badge.rare { border-color: rgba(51, 153, 255, 0.3); }
+.rarity-badge.epic { border-color: rgba(187, 102, 255, 0.3); }
+.rarity-badge.legendary { border-color: rgba(255, 204, 0, 0.4); background: rgba(255, 204, 0, 0.05); }
 
 /* Placeholders for other pages */
 .placeholder-box { background: var(--card-black); padding: 50px; text-align: center; border-radius: 10px; color: var(--text-gray); margin-top: 20px;}

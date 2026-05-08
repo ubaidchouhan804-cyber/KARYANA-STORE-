@@ -18,18 +18,31 @@ async function fetchPokemonDatabase() {
         const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${POOL_LIMIT}`);
         const data = await response.json();
         
-        // Map data to include image URLs (using official artwork for better quality)
-        pokemonDatabase = data.results.map((poke, index) => {
-            const id = index + 1;
+        // Fetch detailed data for each pokemon to get types and stats
+        const detailedPromises = data.results.map(p => fetch(p.url).then(res => res.json()));
+        const detailedData = await Promise.all(detailedPromises);
+
+        pokemonDatabase = detailedData.map(data => {
+            const rarities = ['Common', 'Rare', 'Epic', 'Legendary'];
+            const bst = data.stats.reduce((acc, s) => acc + s.base_stat, 0);
+            let rarity = rarities[0];
+            if (bst > 600) rarity = rarities[3];
+            else if (bst > 500) rarity = rarities[2];
+            else if (bst > 400) rarity = rarities[1];
+
             return {
-                id: id,
-                name: poke.name,
-                image: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`
+                id: data.id,
+                name: data.name,
+                image: data.sprites.other['official-artwork'].front_default || data.sprites.front_default,
+                type: data.types.map(t => t.type.name),
+                rarity: rarity,
+                bst: bst
             };
         });
 
         renderGrid(pokemonDatabase);
     } catch (error) {
+        console.error(error);
         gridContainer.innerHTML = '<div class="loading-text" style="color:red;">Error loading database. Check internet connection.</div>';
     }
 }
@@ -41,11 +54,33 @@ function renderGrid(pokemonList) {
 
     pokemonList.forEach(poke => {
         const div = document.createElement('div');
-        div.className = 'grid-item';
+        div.className = 'poke-card';
+        
+        // Map types to mini icons
+        const typeSymbols = {
+            fire: '🔥', water: '💧', grass: '🌿', electric: '⚡', ice: '❄️',
+            fighting: '👊', poison: '☣️', ground: '⛰️', flying: '🕊️',
+            psychic: '👁️', bug: '🐛', rock: '💎', ghost: '👻',
+            dragon: '🐲', dark: '🌙', steel: '⚙️', fairy: '✨', normal: '⚪'
+        };
+        
+        const typeIconsTop = poke.type.map(t => `<div class="mini-type-icon ${t}">${typeSymbols[t] || '●'}</div>`).join('');
+        
         div.innerHTML = `
-            <span class="grid-id">#${poke.id.toString().padStart(3, '0')}</span>
-            <img src="${poke.image}" alt="${poke.name}" class="grid-img" loading="lazy">
-            <span class="grid-name">${poke.name}</span>
+            <div class="card-header">
+                ${typeIconsTop}
+            </div>
+            <img src="${poke.image}" alt="${poke.name}" class="card-img" loading="lazy">
+            <div class="poke-info">
+               <span class="poke-name">${poke.name}</span>
+               <span class="poke-number">#${poke.id.toString().padStart(3, '0')}</span>
+            </div>
+            <div class="card-footer">
+                <div class="rarity-badge ${poke.rarity.toLowerCase()}">
+                    <span class="rarity-value">${Math.floor(poke.bst / 30)}</span>
+                    <span class="rarity-text">${poke.rarity}</span>
+                </div>
+            </div>
         `;
         // On click, assign this pokemon to the active slot
         div.onclick = () => assignPokemonToSlot(poke);
