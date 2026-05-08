@@ -67,14 +67,68 @@
                 </div>
                 <h3>Select a Poke (Click to assign to active slot)</h3>
                 <div id="pokemon-grid" class="pokemon-grid">
-                    <div class="loading-text">Loading 200 Pokes Database...</div>
+                    <div class="loading-text">Loading 500 Pokes Database...</div>
                 </div>
             </div>
         </div>
 
         <div id="pokes-section" class="content-section">
-            <h2>Pokes Directory</h2>
-            <div class="placeholder-box">Master list of all Pokes.</div>
+            <div class="directory-header">
+                <h1>PokeBreeding <span>Pokes</span></h1>
+                <p>Pokes Elements, Abilities, Rarity and Stats.</p>
+            </div>
+
+            <div class="filter-container">
+                <div class="filter-row">
+                    <div class="filter-item search-item">
+                        <label>Search for Poke</label>
+                        <input type="text" id="directorySearch" placeholder="Enter name" class="directory-input">
+                    </div>
+                    <div class="filter-item">
+                        <label>Rarity</label>
+                        <select id="rarityFilter" class="directory-select">
+                            <option value="all">Select rarity</option>
+                            <option value="Common">Common</option>
+                            <option value="Rare">Rare</option>
+                            <option value="Epic">Epic</option>
+                            <option value="Legendary">Legendary</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label>Sort</label>
+                        <select id="sortField" class="directory-select">
+                            <option value="name">Name</option>
+                            <option value="id">ID</option>
+                            <option value="bst">BST</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label>Order</label>
+                        <select id="sortOrder" class="directory-select">
+                            <option value="asc">Ascending</option>
+                            <option value="desc">Descending</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="element-filter">
+                    <h3>Filter by element</h3>
+                    <div class="element-icons" id="elementFilterIcons">
+                        <!-- Icons will be generated -->
+                    </div>
+                </div>
+
+                <div class="work-filter">
+                    <h3>Filter by work</h3>
+                    <div class="work-icons" id="workFilterIcons">
+                        <!-- Icons will be generated -->
+                    </div>
+                </div>
+            </div>
+
+            <div id="directory-grid" class="pokemon-grid">
+                <!-- Pokes will be rendered here -->
+            </div>
         </div>
 
         <div id="map-section" class="content-section">
